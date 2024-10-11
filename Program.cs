@@ -1,18 +1,20 @@
-﻿string path = "C:\\Users\\msette\\Desktop\\C#\\Rubrica\\bin\\Debug\\net8.0\\Rubrica.csv";
+﻿
+using System.Xml.Serialization;
+
+string path = "C:\\Users\\msette\\Desktop\\C#\\Rubrica\\bin\\Debug\\net8.0\\Rubrica.csv";
 
 await Program();
 async Task Program()
 {
-    
-
 
     bool end = false;
 
-    do {
-        Rubrica();
+    do
+    {
+        await Rubrica();
 
         string scelta = Console.ReadLine();
-        
+
 
         switch (scelta)
         {
@@ -37,21 +39,39 @@ async Task Program()
                 break;
 
             case "6":
-
+                await ImportFile();
                 break;
 
             case "7":
-
+                await ExportFile();
                 break;
 
             case "8":
-                await Exit();
+                end = true;
+                Console.WriteLine("Grazie e Arrivederci");
                 break;
 
         }
     } while (!end);
-  
+    Console.ReadKey();
 }
+
+//fuzione comandi
+
+async Task Rubrica()
+{
+
+    Console.WriteLine("1 - Inserisci Contatto ");
+    Console.WriteLine("2 - Visualizza Contatti ");
+    Console.WriteLine("3 - Modifica Contatto ");
+    Console.WriteLine("4 - Elimina Contatto ");
+    Console.WriteLine("5 - Elimina Rubrica ");
+    Console.WriteLine("6 - Importa Rubrica");
+    Console.WriteLine("7 - Esporta Rubrica ");
+    Console.WriteLine("8 - Esci dalla rubrica");
+}
+
+
 
 //Funzione crea contatto
 async Task CreateContact()
@@ -76,9 +96,22 @@ async Task CreateContact()
 
 async Task ReadContact()
 {
-    Console.WriteLine("questi sono i contatti in rubrica:");
-    string ContactBook = await File.ReadAllTextAsync(path);
-    Console.WriteLine(ContactBook);
+
+
+    if (!File.Exists(path))
+    {
+        Console.WriteLine("La rubrica non esiste");
+    }
+    else if ((await File.ReadAllLinesAsync(path)).Length <= 0)
+    {
+        Console.WriteLine("La rubrica è vuota");
+    }
+    else
+    {
+        string contactBook = await File.ReadAllTextAsync(path);
+        Console.WriteLine("questi sono i contatti in rubrica:");
+        Console.WriteLine(contactBook);
+    }
 
     bool end = false;
 }
@@ -100,7 +133,7 @@ async Task ModifyContact()
     {
         if (arrayContact[i].Contains(ModifyEmail))
         {
-            //Console.WriteLine("TROVATO");
+
             Console.WriteLine("Inserisci Nome contatto:");
             string? name = Console.ReadLine();
             Console.WriteLine("Inserisci Cognome:");
@@ -111,19 +144,20 @@ async Task ModifyContact()
             string? phone = Console.ReadLine();
 
             string contactNew = $"{name}, {surname}, {email}, {phone}";
-
-            arrayContact[i]= arrayContact[i].Replace(arrayContact[i], contactNew);
-            await File.WriteAllLinesAsync(path, arrayContact);
+            arrayContact[i] = arrayContact[i].Replace(arrayContact[i], contactNew);
 
             Console.WriteLine("Contatto modificato con successo");
 
             trovato = true;
         }
     }
-       if (!trovato)
-        {
-            Console.WriteLine("email non trovata");
-        }
+    
+    await File.WriteAllLinesAsync(path, arrayContact);
+
+    if (!trovato)
+    {
+        Console.WriteLine("email non trovata");
+    }
 }
 
 //Funzione elimina contatto
@@ -157,36 +191,31 @@ async Task DeleteContact()
 
 }
 
-    //funzione di elimina rubrica
+//funzione di elimina rubrica
 
-    async Task DeletePhoneNumbers()
-    {
-        File.Delete(path);
-        Console.WriteLine("Rubrica ELIMINATA!!");
-    }
+async Task DeletePhoneNumbers()
+{
+    File.Delete(path);
+    Console.WriteLine("Rubrica ELIMINATA!!");
+}
 
+//Importa Rubrica
 
-    //Funzione Uscita rubrica
-
-    async Task Exit()
-    {
-        bool end = false;
-    }
-
+async Task ImportFile()
+{
+    Console.WriteLine("Ci vediamo Lunedi");
+}
 
 
-    //fuzione comandi
 
-    async Task Rubrica()
-    {
+//Esportazione
 
-        Console.WriteLine("1 - Inserisci Contatto ");
-        Console.WriteLine("2 - Visualizza Contatti ");
-        Console.WriteLine("3 - Modifica Contatto ");
-        Console.WriteLine("4 - Elimina Contatto ");
-        Console.WriteLine("5 - Elimina Rubrica ");
-        Console.WriteLine("6 - Importa Rubrica");
-        Console.WriteLine("7 - Esporta Rubrica ");
-        Console.WriteLine("8 - Esci dalla rubrica");
-    }
+async Task ExportFile()
+{
+    string newPath = "C:\\Users\\msette\\Desktop\\Rubrica.csv";
+
+    File.Copy(path, newPath);
+    Console.WriteLine("Rubrica esportata sul Desktop");
+
+}
 
