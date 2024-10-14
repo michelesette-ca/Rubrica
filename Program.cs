@@ -12,7 +12,7 @@ async Task Program()
 
     do
     {
-        await Rubrica();
+        Rubrica();
 
         string? scelta = Console.ReadLine();
 
@@ -61,8 +61,9 @@ async Task Program()
 
 //fuzione comandi
 
-async Task Rubrica()
+void Rubrica()
 {
+
 
     Console.WriteLine("1 - Inserisci Contatto ");
     Console.WriteLine("2 - Visualizza Contatti ");
@@ -76,7 +77,7 @@ async Task Rubrica()
 
 
 
-//Funzione crea contatto
+//Funzione crea contatto (case 1)
 async Task CreateContact()
 {
     Console.WriteLine("Inserisci Nome contatto:");
@@ -86,9 +87,12 @@ async Task CreateContact()
     Console.WriteLine("Inserisci Email:");
     string? email = Console.ReadLine();
 
-    string fileValue = await File.ReadAllTextAsync(path);
+    if (!File.Exists(path))
+    {
+        using StreamWriter writer = new StreamWriter(path);
+    }
+    string[] arrayContact = await File.ReadAllLinesAsync(path);
 
-    string[] arrayContact = fileValue.Split('\n');
 
     bool trovato = false;
 
@@ -118,7 +122,7 @@ async Task CreateContact()
 
 }
 
-//Funzoine che visualizza i contatti
+//Funzoine che visualizza i contatti (Case 2)
 
 async Task ReadContact()
 {
@@ -142,16 +146,14 @@ async Task ReadContact()
 
 }
 
-//Funzione per modificare un contatto
+//Funzione per modificare un contatto (Case 3)
 
 async Task ModifyContact()
 {
     Console.WriteLine("Inserisci l'email del contatto da modificare: ");
     string? modifyEmail = Console.ReadLine();
 
-    string fileValue = await File.ReadAllTextAsync(path);
-
-    string[] arrayContact = fileValue.Split('\n');
+    string[] arrayContact = await File.ReadAllLinesAsync(path);
 
     bool trovato = false;
 
@@ -210,22 +212,20 @@ async Task ModifyContact()
     }
 }
 
-//Funzione elimina contatto
+//Funzione elimina contatto (Case 4)
 
 async Task DeleteContact()
 {
     Console.WriteLine("Inserisci l'email del contatto da Eliminare: ");
     string? deleteContact = Console.ReadLine();
 
-    string contactValue = await File.ReadAllTextAsync(path);
-
-    string[] arrayContact = contactValue.Split('\n');
+    string[] arrayContact = await File.ReadAllLinesAsync(path);
 
     bool trovato = false;
 
     for (int i = 0; i < arrayContact.Length; i++)
     {
-        if (arrayContact[i].Contains(deleteContact))
+        if (!string.IsNullOrEmpty(deleteContact) && arrayContact[i].Contains(deleteContact))
         {
             //Conferma eliminazione contatto
             string answer = "";
@@ -262,7 +262,7 @@ async Task DeleteContact()
 
 }
 
-//funzione di elimina rubrica
+//funzione di elimina rubrica (Case 5)
 
 async Task DeletePhoneNumbers()
 {
@@ -270,7 +270,7 @@ async Task DeletePhoneNumbers()
     while (answer != "si" && answer != "no")
     {
 
-        Console.WriteLine("Sei sicuro di voler eleiminare la rubrica? (si/no)");
+        Console.WriteLine("Sei sicuro di voler eliminare la rubrica? (si/no)");
         answer = Console.ReadLine().ToLower();
         if (answer == "si")
         {
@@ -289,22 +289,62 @@ async Task DeletePhoneNumbers()
     }
 }
 
-//Importa Rubrica
+//Importa Rubrica (Case 6)
 
 async Task ImportFile()
 {
-    File.Copy(newPath, path);
-    Console.WriteLine("Ci vediamo Lunedi");
+    string[] contatti = await File.ReadAllLinesAsync(path);
+
+
+    string[] nuoviContatti = await File.ReadAllLinesAsync(newPath);
+
+
+    for (int i = 0; i < nuoviContatti.Length; i++)
+    {
+
+        string[] newData = nuoviContatti[i].Split(",");
+        for (int j = 0; j < contatti.Length; j++)
+        {
+
+
+            if (contatti[j].Contains(newData[2]))
+            {
+                Console.WriteLine("Vuoi mantenere il nuovo contatto?");
+                string[] dati = contatti[j].Split(",");
+                Console.WriteLine("si - Contatto importato");
+                Console.WriteLine($"Nome: {newData[0]}, Cognome: {newData[1]}, Email: {newData[2]}, Telefono: {newData[3]}");
+                Console.WriteLine("no - Contatto vecchio");
+                Console.WriteLine($"Nome: {dati[0]}, Cognome: {dati[1]}, Email: {dati[2]}, Telefono: {dati[3]}");
+
+                Console.WriteLine("Inserisci il numero del contatto che vuoi mantenere: ");
+                string? scelta = Console.ReadLine();
+
+                if (scelta == "si")
+                {
+                    Console.WriteLine("Operazione effettuata");
+                    contatti[j] = nuoviContatti[i];
+                    break;
+
+                }
+                else
+                {
+                    Console.WriteLine("Carattere non valido");
+                }
+            }
+        }
+
+    }
+    await File.WriteAllLinesAsync(path, contatti);
 }
 
 
 
-//Esportazione
+//Esportazione (Case 7)
 
 async Task ExportFile()
 {
-
-    File.Copy(path, newPath);
+    
+    File.Copy(path, newPath );
     Console.WriteLine("Rubrica esportata sul Desktop");
 
 }
