@@ -2,6 +2,7 @@
 using System.Xml.Serialization;
 
 string path = "C:\\Users\\msette\\Desktop\\C#\\Rubrica\\bin\\Debug\\net8.0\\Rubrica.csv";
+string newPath = "C:\\Users\\msette\\Desktop\\Rubrica.csv";
 
 await Program();
 async Task Program()
@@ -13,7 +14,7 @@ async Task Program()
     {
         await Rubrica();
 
-        string scelta = Console.ReadLine();
+        string? scelta = Console.ReadLine();
 
 
 
@@ -123,7 +124,7 @@ async Task ReadContact()
 async Task ModifyContact()
 {
     Console.WriteLine("Inserisci l'email del contatto da modificare: ");
-    string ModifyEmail = Console.ReadLine();
+    string? modifyEmail = Console.ReadLine();
 
     string fileValue = await File.ReadAllTextAsync(path);
 
@@ -133,7 +134,7 @@ async Task ModifyContact()
 
     for (int i = 0; i < arrayContact.Length; i++)
     {
-        if (arrayContact[i].Contains(ModifyEmail))
+        if (arrayContact[i].Contains(modifyEmail))
         {
 
             Console.WriteLine("Inserisci Nome contatto:");
@@ -146,9 +147,25 @@ async Task ModifyContact()
             string? phone = Console.ReadLine();
 
             string contactNew = $"{name}, {surname}, {email}, {phone}";
-            arrayContact[i] = arrayContact[i].Replace(arrayContact[i], contactNew);
 
-            Console.WriteLine("Contatto modificato con successo");
+            //Conferma modifica
+            ricomincia:
+            Console.WriteLine("Sei sicuro di voler modificare il contatto? (si/no)");
+            string answer = Console.ReadLine().ToLower();
+
+            if (answer == "si") { 
+                arrayContact[i] = arrayContact[i].Replace(arrayContact[i], contactNew);
+                Console.WriteLine("Contatto modificato con successo");
+    
+            } else if(answer == "no")
+            {
+                Console.WriteLine("Operazione annullata");
+            } else
+            {
+                Console.WriteLine("Carattere non valido");
+                goto ricomincia;
+            }
+
 
             trovato = true;
         }
@@ -167,22 +184,37 @@ async Task ModifyContact()
 async Task DeleteContact()
 {
     Console.WriteLine("Inserisci l'email del contatto da Eliminare: ");
-    string DeleteContact = Console.ReadLine();
+    string? deleteContact = Console.ReadLine();
 
-    string ContactValue = await File.ReadAllTextAsync(path);
+    string contactValue = await File.ReadAllTextAsync(path);
 
-    string[] arrayContact = ContactValue.Split('\n');
+    string[] arrayContact = contactValue.Split('\n');
 
     bool trovato = false;
 
     for (int i = 0; i < arrayContact.Length; i++)
     {
-        if (arrayContact[i].Contains(DeleteContact))
+        if (arrayContact[i].Contains(deleteContact))
         {
-            arrayContact[i] = arrayContact[i].Remove(0);
-            await File.WriteAllLinesAsync(path, arrayContact);
+            //Conferma eliminazione contatto
+            ricomincia:
+            Console.WriteLine("Sei sicuro di voler eliminare il contatto? (si/no)");
+            string answer = Console.ReadLine().ToLower();
 
-            Console.WriteLine("Contatto Eliminato con successo");
+            if (answer == "si")
+            {
+                arrayContact[i] = arrayContact[i].Remove(0);
+                await File.WriteAllLinesAsync(path, arrayContact);
+                Console.WriteLine("Contatto Eliminato con successo");
+            }
+            else if (answer == "no")
+            {
+                Console.WriteLine("Operazione annullata");
+            }
+            else {
+                goto ricomincia;
+                }
+
             trovato = true;
         }
     }
@@ -197,14 +229,29 @@ async Task DeleteContact()
 
 async Task DeletePhoneNumbers()
 {
-    File.Delete(path);
-    Console.WriteLine("Rubrica ELIMINATA!!");
+    ricomincia:
+    Console.WriteLine("Sei sicuro di voler eleiminare la rubrica? (si/no)");
+    string answer = Console.ReadLine().ToLower();
+    if (answer == "si")
+    {
+        File.Delete(path);
+        Console.WriteLine("Rubrica ELIMINATA!!");
+    }
+    else if (answer == "no")
+    {
+        Console.WriteLine("Operazione annullata");
+    }
+    else {
+        Console.WriteLine("carattere non valido");
+        goto ricomincia;
+    }
 }
 
 //Importa Rubrica
 
 async Task ImportFile()
 {
+    File.Copy(newPath,path);
     Console.WriteLine("Ci vediamo Lunedi");
 }
 
@@ -214,10 +261,10 @@ async Task ImportFile()
 
 async Task ExportFile()
 {
-    string newPath = "C:\\Users\\msette\\Desktop\\Rubrica.csv";
 
     File.Copy(path, newPath);
     Console.WriteLine("Rubrica esportata sul Desktop");
 
 }
 
+    
