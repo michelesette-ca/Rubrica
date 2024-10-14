@@ -174,7 +174,7 @@ async Task ModifyContact()
             //Conferma modifica
             string answer = "";
 
-            while ( answer != "si" && answer != "no")
+            while (answer != "si" && answer != "no")
             {
                 Console.WriteLine("Sei sicuro di voler modificare il contatto? (si/no)");
                 answer = Console.ReadLine().ToLower();
@@ -227,24 +227,29 @@ async Task DeleteContact()
     {
         if (arrayContact[i].Contains(deleteContact))
         {
-        //Conferma eliminazione contatto
-        ricomincia:
-            Console.WriteLine("Sei sicuro di voler eliminare il contatto? (si/no)");
-            string answer = Console.ReadLine().ToLower();
+            //Conferma eliminazione contatto
+            string answer = "";
+            while (answer != "si" && answer != "no")
+            {
+                Console.WriteLine("Sei sicuro di voler eliminare il contatto? (si/no)");
 
-            if (answer == "si")
-            {
-                arrayContact[i] = arrayContact[i].Remove(0);
-                await File.WriteAllLinesAsync(path, arrayContact);
-                Console.WriteLine("Contatto Eliminato con successo");
-            }
-            else if (answer == "no")
-            {
-                Console.WriteLine("Operazione annullata");
-            }
-            else
-            {
-                goto ricomincia;
+
+                answer = Console.ReadLine().ToLower();
+
+                if (answer == "si")
+                {
+                    arrayContact[i] = arrayContact[i].Remove(0);
+                    await File.WriteAllLinesAsync(path, arrayContact);
+                    Console.WriteLine("Contatto Eliminato con successo");
+                }
+                else if (answer == "no")
+                {
+                    Console.WriteLine("Operazione annullata");
+                }
+                else
+                {
+                    Console.WriteLine("Carattere non valido");
+                }
             }
 
             trovato = true;
@@ -261,22 +266,26 @@ async Task DeleteContact()
 
 async Task DeletePhoneNumbers()
 {
-ricomincia:
-    Console.WriteLine("Sei sicuro di voler eleiminare la rubrica? (si/no)");
-    string answer = Console.ReadLine().ToLower();
-    if (answer == "si")
+    string answer = "";
+    while (answer != "si" && answer != "no")
     {
-        File.Delete(path);
-        Console.WriteLine("Rubrica ELIMINATA!!");
-    }
-    else if (answer == "no")
-    {
-        Console.WriteLine("Operazione annullata");
-    }
-    else
-    {
-        Console.WriteLine("carattere non valido");
-        goto ricomincia;
+
+        Console.WriteLine("Sei sicuro di voler eleiminare la rubrica? (si/no)");
+        answer = Console.ReadLine().ToLower();
+        if (answer == "si")
+        {
+            File.Delete(path);
+            Console.WriteLine("Rubrica ELIMINATA!!");
+        }
+        else if (answer == "no")
+        {
+            Console.WriteLine("Operazione annullata");
+        }
+        else
+        {
+            Console.WriteLine("Carattere non valido");
+
+        }
     }
 }
 
